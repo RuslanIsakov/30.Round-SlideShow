@@ -1,1 +1,70 @@
+ <!DOCTYPE HTML>
+ <html>
+ <head>
+     <meta charset="UTF-8">
+     <title>Round Slideshow</title>
 
+ </head>
+ <body>
+     <main id="main">
+		  <gallery ref="gallery" v-bind:images="images" v-on:next="next">
+		  </gallery>
+	</main>
+
+<template id="gallery_template">
+  <transition-group tag="figure" class="Gallery" name="open">
+    <img v-for="(image, index) of images" 
+         v-bind:src="image" 
+         v-bind:key="index"
+         v-on:click="onClick"
+         v-bind:style="{'--circle-x': x, '--circle-y': y}">
+  </transition-group>
+</template>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.2.4/vue.min.js"></script>
+<script>
+     Vue.component('gallery', {
+  template: '#gallery_template',
+  props: {
+    images: Array
+  },
+  data() {
+    return {
+      x: '100%',
+      y: '100%'
+    }
+  },
+  methods: {
+    onClick(event) {
+      const x = event.offsetX - event.target.offsetLeft
+      const y = event.offsetY - event.target.offsetTop
+      const xPercent = `${Math.round(100 * x / event.target.offsetWidth)}%`
+      const yPercent = `${Math.round(100 * y / event.target.offsetHeight)}%`
+      this.x = xPercent
+      this.y = yPercent
+      this.$emit('next', {x: xPercent, y: yPercent})
+    }
+  }
+})
+
+const vm = new Vue({
+  el: '#main',
+  data: {
+    images: [
+	  'images/5.jpg',
+      'images/4.jpg',
+      'images/3.jpg',
+      'images/2.jpg',
+      'images/1.jpg'
+    ]
+  },
+   methods: {
+    next() {
+      const image = this.images.shift()
+      this.$nextTick(() => this.images.push(image))
+    }
+  }
+})
+     
+</script>
+ </body>
+ </html>
